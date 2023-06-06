@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Profile
+from .models import Profile, Post
 
 @login_required(login_url='signin')
 def index(request):
@@ -88,3 +88,16 @@ def settings(request):
         return redirect('settings')
 
     return render(request,'setting.html',{'user_profile':user_profile})
+
+@login_required(login_url='signin')
+def upload(request):
+    if request.method == 'POST':
+        user = request.user.username
+        image = request.FILES.get('image_upload')
+        caption = request.POST['caption']
+
+        new_post = Post.objects.create(user=user,image=image,caption=caption)
+        new_post.save()
+        return redirect('/')
+    else:
+        return redirect('/')
