@@ -9,7 +9,8 @@ from .models import Profile, Post
 @login_required(login_url='signin')
 def index(request):
     user=Profile.objects.get(user=request.user)
-    return render(request,'index.html',{'user':user})
+    posts= Post.objects.all()
+    return render(request,'index.html',{'user':user,'posts':posts})
 
 def signup(request):
     if request.method=='POST':
