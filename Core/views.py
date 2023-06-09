@@ -5,12 +5,27 @@ from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Profile, Post ,LikePost, FollowerCount
+from itertools import chain
 
 @login_required(login_url='signin')
 def index(request):
     user=Profile.objects.get(user=request.user)
+
+    user_following_list = []
+    feed = []
+    user_follwing = FollowerCount.objects.filter(follower=request.user.username)
+
+    for users in user_follwing:
+        user_following_list.append(users.user)
+    
+    for usernames in user_following_list:
+        feed_lists = Post.objects.filter(user=usernames)
+        feed.append(feed_lists)
+    
+    feed_list = list(chain(*feed))
+
     posts= Post.objects.all()
-    return render(request,'index.html',{'user':user,'posts':posts})
+    return render(request,'index.html',{'user':user,'posts':feed_list})
 
 def signup(request):
     if request.method=='POST':
